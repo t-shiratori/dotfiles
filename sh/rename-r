@@ -1,0 +1,60 @@
+#!/bin/zsh
+
+# ----------------------------------------------------
+# ディレクトリ名とファイル名を再帰的に置換する、printColorを無くしたシンプル版
+# @param $1 ディレクトリパス
+# @param $2 置換前の文字列
+# @param $3 置換後の文字列
+# ----------------------------------------------------
+
+# 変換したいルートディレクトリパス
+startDir=$1
+beforeStrings=$2
+afterStrings=$3
+
+if [ -z $startDir ]; then
+  echo "ディレクトリパスを指定してください"
+  exit 1
+fi
+
+if [ -z $beforeStrings ]; then
+  echo "置換前の文字列を指定してください"
+  exit 1
+fi
+
+if [ -z $afterStrings ]; then
+  echo "置換後の文字列を指定してください"
+  exit 1
+fi
+
+# ディレクトリに移動
+cd ${startDir}
+echo "cd ${startDir}"
+
+# ディレクトリの深さを取得
+dirDepth=`find . -type d | awk -F/ '{ print NF }' | sort | tail -1`
+echo "dirDepth: $dirDepth"
+
+# ディレクトリの階層を上から順に潜ってリネーム処理をしていく
+for dirLevel in $(seq $dirDepth)
+do  
+    echo "---------------------------------------------------"
+    echo "dirLevel: $dirLevel"
+
+    # ディレクトリの深さに応じてファイル名を取得
+    targetNames=`find . -maxdepth $dirLevel -name "*$beforeStrings*"`
+
+    if [ -z "$targetNames" ]; then
+        echo "対象のファイルが見つかりませんでした"
+        continue
+    fi
+    
+    while read targetName; do
+      # 新しい名前を作成
+      newName=${targetName//$beforeStrings/$afterStrings}
+      # 名前を変更
+      mv $targetName $newName
+      # 結果を出力
+      echo "Renamed: $targetName -> $newName"
+    done <<< "${targetNames}"
+done

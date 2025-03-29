@@ -1,0 +1,2 @@
+rm -rf test-dir
+cp -r -f test-dir0 test-dir

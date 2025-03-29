@@ -1,0 +1,68 @@
+#!/bin/zsh
+
+# ----------------------------------------------------
+# ファイル名のみを再帰的に置換する
+# @param $1 ディレクトリパス
+# @param $2 置換前の文字列
+# @param $3 置換後の文字列
+# ----------------------------------------------------
+
+# 変換したいルートディレクトリパス
+startDir=$1
+beforeStrings=$2
+afterStrings=$3
+
+if [ -z $startDir ]; then
+  echo "ディレクトリパスを指定してください"
+  exit 1
+fi
+
+if [ -z $beforeStrings ]; then
+  echo "置換前の文字列を指定してください"
+  exit 1
+fi
+
+if [ -z $afterStrings ]; then
+  echo "置換後の文字列を指定してください"
+  exit 1
+fi
+
+# ディレクトリに移動
+cd ${startDir}
+echo "cd ${startDir}"
+
+# ファイル名一覧を取得
+targetNames=`find . -type f -name "*$beforeStrings*"`
+
+if [ -z "$targetNames" ]; then
+  echo "対象のファイルが見つかりませんでした"
+  return 1
+fi
+
+echo "targetNames: ${targetNames}"
+
+while read targetName; do
+    echo "---------------------------------------------------"
+    echo "targetName: ${targetName}"
+
+    # ディレクトリパスを除いたファイル名を取得
+    fileName=`echo ${targetName} | awk -F/ '{print $NF}'`
+    echo "fileName: ${fileName}"
+
+    # ディレクトリパスのみを取得
+    dirName=${targetName%/*}
+    echo "dirName: ${dirName}"
+
+    # 新しいファイル名前を作成
+    newName=${fileName//$beforeStrings/$afterStrings}
+
+    # 新しいフルパス
+    newFullName=${dirName}/${newName}
+    echo "newFullName: ${newFullName}"
+
+    # 名前を変更
+    mv $targetName $newFullName
+
+    # 結果を出力
+    echo "Renamed: $targetName -> $newFullName"
+done <<< "${targetNames}"

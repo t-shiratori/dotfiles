@@ -1,0 +1,57 @@
+#!/bin/zsh
+
+# add new dayly log
+
+function printColor () {
+    local defaultColor=36
+    local color=${3-${defaultColor}}
+    echo -e "\e[${color}m$1\e[m $2"
+}
+
+function dtouch_one () {
+  local filePath=$1
+
+  # -zは文字列であるかどうか
+  if [[ -z $filePath ]]; then
+    printf 'filePath名がおかしいです' 1>$2
+    return 1
+  fi
+
+  # ディレクトリ名を取得
+  # 引数の文字列にスラッシュが含まれているか確認（つまりディレクトリが含まれているかを確認）
+  # 含まれている場合はディレクトリ部分の文字列を取得（ファイル名は含めない）
+  local dir=
+  # 「*/*」はパターンマッチでスラッシュが含まれているかをチェックしている
+  if [[ $filePath == */* ]]; then
+  # ${filePath%/*}はパラメーター展開で後方一致切り取り
+    dir=${filePath%/*}
+    printf "dir: %s\n" $dir
+  fi
+
+  # ディレクトリが存在しなければ作成する
+  # dirにディレクトリ名が格納されている場合はディレクトリを作成する
+# 「-n」は文字列ではないことをチェック、 「! -d $dir」はディレクトリが存在しないことをチェックしている
+  if [[ -n $dir && ! -d $dir ]]; then
+    mkdir -p -- "$dir" || return 2
+  fi
+
+  # ファイルが存在しなければ作成する
+  # 「 ! -e $filePath」はファイルが存在しないことをチェックしている
+  if [[ ! -e $filePath ]]; then
+    touch -- $filePath
+  fi
+}
+
+month=`date '+%Y-%m'`
+# nextMonth=`date -v+1m '+%Y-%m'`
+
+today=`date '+%Y-%m-%d'`
+# tomorrow=`date -v+10d +"%Y-%m-%d"`
+
+createFile=${month}/${today}.md
+
+printColor $createFile
+
+dtouch_one "$createFile"
+
+cp template.md ${createFile}

@@ -1,0 +1,42 @@
+#!/bin/zsh
+
+# ----------------------------------------------------
+# 指定したイシューIDのデータを元にブラウザでイシューの新規作成画面を表示します
+# @param $1 イシューID
+# ----------------------------------------------------
+
+source printColor
+
+# issueId
+issueId=$1
+
+# ローカルリポジトリのパス
+repoPath=パスを入力
+
+# イシューIDの指定がない場合はエラーで終了させる
+if [ -z $issueId ]; then
+  printColor ">[エラー]" "引数でイシューIDを指定してください" 32
+  exit 1;
+fi
+
+# リポジトリに移動
+printColor ">[Action]" "cd ${repoPath}"
+cd ${repoPath}
+
+# githubからイシューのデータを取得
+# @see https://cli.github.com/manual/gh_issue
+issueData=$(gh issue view "$issueId" --json body,title,labels --jq '{body: .body, title: .title, labelNameList: [.labels[].name]}')
+
+# printColor ">[issueData]" "${issueData}"
+
+# JSONデータを解析して、タイトル、本文、ラベルを抽出
+title=$(echo -E "$issueData" | jq -r '.title')
+body=$(echo -E "$issueData" | jq -r '.body')
+labelNameList=$(echo -E "$issueData" | jq -r '[.labelNameList[]] | join(",")')
+
+# printColor ">[title]" "${title}"
+# printColor ">[body]" "${body}"
+# printColor ">[labels]" "${labelNameList}"
+
+# 新しいイシューを作成
+gh issue create --title "$title コピー" --body "$body" --label "$labelNameList" --web

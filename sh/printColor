@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+function printColor () {
+    local defaultColor=36
+    local color=${3-${defaultColor}}
+    echo -e "\e[${color}m$1\e[m $2"
+}
