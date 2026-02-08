@@ -1,17 +1,13 @@
 # Flutter
-export PATH="$PATH:/Users/ユーザー/Development/sdk/flutter/bin"
-# Golang
-# https://github.com/syndbg/goenv/blob/master/INSTALL.md
-export GOPATH=$HOME/go
-export GOENV_ROOT=$HOME/.goenv
-export PATH="$GOENV_ROOT/bin:$PATH"
-eval "$(goenv init -)"
-export PATH="$GOROOT/bin:$PATH"
-export PATH="$PATH:$GOPATH/bin"
+export PATH="$PATH:/Users/[user]/Development/sdk/flutter/bin"
 # Deno
-export PATH="/Users/ユーザー/.deno/bin:$PATH"
+export PATH="/Users/[user]/.deno/bin:$PATH"
 # MyCommand
-export PATH="$PATH:/Users/ユーザー/Documents/my-command"
+export PATH="$PATH:/Users/[user]/Documents/my-command"
+# Docker
+export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
+# Go 自作ツール用
+export PATH="$PATH:$HOME/go/bin"
 
 # prompt
 PS1="%. $ "
